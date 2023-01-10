@@ -16,6 +16,33 @@ WEEKEND_RULE.minute = 00;
 const WEEKDAY_JOB = schedule.scheduleJob(WEEKDAY_RULE, getDateOfCurrentEntry);
 const WEEKEND_JOB = schedule.scheduleJob(WEEKEND_RULE, getDateOfCurrentEntry);
 
+function writeToLogFile(message) {
+	fs.appendFileSync('task-log.txt', message);
+}
+
+function programIsNotPublished(currentDate, entryDate) {
+	const todaysEntryIsPublished = currentDate.getDay() === entryDate.getDay();
+	const isPastWeekendPublishTime = currentDate.getDay() === 0 && currentDate.getHours() >= WEEKDAY_RULE.hour;
+	const isPastWeekdayPublishTime = currentDate.getHours() >= WEEKEND_RULE.hour;
+	
+    if (currentDate === 6 || todaysEntryIsPublished) {
+        writeToLogFile(`${currentDate} --WAS PUBLISHED SUCCESSFULLY\n`);
+        return false;
+    } else if (!todaysEntryIsPublished && (isPastWeekendPublishTime || isPastWeekdayPublishTime)) {
+        writeToLogFile(`${currentDate} --WAS NOT PUBLISHED\n`);
+        return true;
+    }
+}
+
+function compareTime(title) {
+    const currentDate = new Date();
+    const showTime = new Date(title);
+
+    if (programIsNotPublished(currentDate, showTime)) {
+        //runAutoPublish(); -- To Do
+    }
+}
+
 function getDateOfCurrentEntry() {
 	axios.get(process.env.WEBSITE).then(res => {
 		compareTime(res.data.title);
