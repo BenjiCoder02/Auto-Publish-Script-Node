@@ -16,11 +16,39 @@ WEEKEND_RULE.minute = 00;
 const WEEKDAY_JOB = schedule.scheduleJob(WEEKDAY_RULE, getDateOfCurrentEntry);
 const WEEKEND_JOB = schedule.scheduleJob(WEEKEND_RULE, getDateOfCurrentEntry);
 
+const HTML_FILE_FOR_EMAIL = fs.readFileSync('index.html', (err) => { console.log(err) });
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_ID,
+        pass: process.env.PASSWORD
+    }
+});
+
+var mailOptions = {
+    from: process.env.EMAIL_ID,
+    to: process.env.RECIPIENTS,
+    subject: 'Today\'s entry not published!',
+    text: 'Please publish',
+    html: HTML_FILE_FOR_EMAIL,
+};
+
+function sendEmailAlert() {
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            writeToLogFile(`Error Sending email: ${error}`)
+        } else {
+            writeToLogFile(`Email sent: ${info.response}`);
+        }
+    });
+}
+
 function writeToLogFile(message) {
 	fs.appendFileSync('task-log.txt', message);
 }
 
-function programIsNotPublished(currentDate, entryDate) {
+function entryIsNotPublished(currentDate, entryDate) {
 	const todaysEntryIsPublished = currentDate.getDay() === entryDate.getDay();
 	const isPastWeekendPublishTime = currentDate.getDay() === 0 && currentDate.getHours() >= WEEKDAY_RULE.hour;
 	const isPastWeekdayPublishTime = currentDate.getHours() >= WEEKEND_RULE.hour;
@@ -36,9 +64,10 @@ function programIsNotPublished(currentDate, entryDate) {
 
 function compareTime(title) {
     const currentDate = new Date();
-    const showTime = new Date(title);
+    const mostRecentEntryDate = new Date(title);
 
-    if (programIsNotPublished(currentDate, showTime)) {
+    if (entryIsNotPublished(currentDate, mostRecentEntryDate)) {
+		sendEmailAlert();
         //runAutoPublish(); -- To Do
     }
 }
