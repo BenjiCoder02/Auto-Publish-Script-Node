@@ -1,0 +1,26 @@
+{
+  "name": "auto-publish-script-node",
+  "version": "1.0.0",
+  "description": "This is a scheduled job to check for an event that should be published at a specific time each day. If it isn't published, this program will automatically publish and notify the user if there is any error with publishing via email.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenjiCoder02/Auto-Publish-Script-Node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BenjiCoder02/Auto-Publish-Script-Node/issues"
+  },
+  "homepage": "https://github.com/BenjiCoder02/Auto-Publish-Script-Node#readme",
+  "dependencies": {
+    "axios": "^1.2.2",
+    "dotenv": "^16.0.3",
+    "node-schedule": "^2.1.0",
+    "nodemailer": "^6.8.0",
+    "nodemon": "^2.0.20"
+  }
+}
